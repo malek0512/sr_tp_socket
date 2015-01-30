@@ -62,6 +62,7 @@ public class Spooler extends Thread {
 		GUI.dispose();
 		try{
 			//----------------------------------------------------------------------------- A COMPLETER
+			throw new IOException();
 		}catch(IOException e){
 			log.log(Level.SEVERE,e.getMessage());
 		}

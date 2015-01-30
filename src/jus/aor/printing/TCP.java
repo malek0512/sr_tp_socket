@@ -33,6 +33,7 @@ class TCP{
 	 * @throws IOException
 	 */
 	static JobKey readJobKey(Socket soc) throws IOException {
+		return null;
 	//----------------------------------------------------------------------------- A COMPLETER
 	}
 	/**
@@ -52,6 +53,7 @@ class TCP{
 	 * @throws IOException
 	 */
 	static String readData(Socket soc) throws IOException {
+		return null;
 	//----------------------------------------------------------------------------- A COMPLETER
 	}
 	/**
@@ -70,6 +72,7 @@ class TCP{
 	 * @throws IOException
 	 */
 	static Notification readProtocole(Socket soc) throws IOException {
+		return null;
 	//----------------------------------------------------------------------------- A COMPLETER
 	}
 	/**
@@ -89,6 +92,7 @@ class TCP{
 	 * @throws ClassNotFoundException
 	 */
 	static JobState readJobState(Socket soc) throws IOException, ClassNotFoundException {
+		return null;
 	//----------------------------------------------------------------------------- A COMPLETER
 	}
 }

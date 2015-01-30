@@ -37,6 +37,7 @@ public class JobKey {
 	 */
 	public JobKey(byte[] marshal) {
 		//----------------------------------------------------------------------------- A COMPLETER
+		this.date = new Long(new String (marshal));
 	}
 	/**
 	 * restitue le tableau de bytes de la forme textuelle.
@@ -44,6 +45,12 @@ public class JobKey {
 	 */
 	public byte[] marshal() {
 		//----------------------------------------------------------------------------- A COMPLETER
+		//byte[] b = new byte[1];
+		//b[0] = new Long(date).byteValue();
+		byte[] b = new Long(date).toString().getBytes();
+		System.out.println(date);
+		System.out.println("Print tab byte "+new String (b));
+		return b;
 	}
 	/**
 	 * la forme textuelle : "<<b>serverId</b>>¤<<b>date</b>>"

@@ -35,6 +35,7 @@ public class UDP{
 	 * @throws IOException
 	 */
 	static Paire<ServerStatus,SocketAddress> readStatus(DatagramSocket soc) throws IOException {
+		return null;
 		//----------------------------------------------------------------------------- A COMPLETER
 	}
 	/**
@@ -54,12 +55,14 @@ public class UDP{
 	 * @throws IOException
 	 */
 	static Paire<Notification,SocketAddress> readProtocole(DatagramSocket soc) throws IOException {
+		return null;
 		//----------------------------------------------------------------------------- A COMPLETER
 	}
 	static void writeEndPrint(DatagramSocket soc, SocketAddress remoteAddress, JobKey key) throws IOException {
 		//----------------------------------------------------------------------------- A COMPLETER
 	}
 	static Paire<Notification,JobKey> readEndPrint(DatagramSocket soc) throws IOException {
+		return null;
 		//----------------------------------------------------------------------------- A COMPLETER
 	}
 }

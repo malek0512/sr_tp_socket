@@ -16,7 +16,7 @@ public class Level extends java.util.logging.Level {
 	/**
 	 * Les niveaux  d'INFO
    */
-  public static final Level INFO_1 = new Level("INFO_1",810);
+	public static final Level INFO_1 = new Level("INFO_1",810);
 	public static final Level INFO_2 = new Level("INFO_2",820);
 	public static final Level INFO_3 = new Level("INFO_3",830);
 	public static final Level INFO_4 = new Level("INFO_4",840);

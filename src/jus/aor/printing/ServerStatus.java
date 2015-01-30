@@ -30,6 +30,7 @@ public class ServerStatus{
 	 * @return le tableau de bytes des représentations hexadécimales du ServerStatus séparées par ¤
 	 */
 	public byte[] marshal() {
+		return null;
 		//-------------------------------------------------------------------------- A COMPLETER
 	}
 	/**

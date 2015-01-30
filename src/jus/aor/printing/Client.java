@@ -4,6 +4,8 @@ import java.net.*;
 import java.util.logging.Logger;
 import java.io.*;
 
+import sun.security.util.Length;
+
 import jus.aor.printing.Client;
 import jus.aor.printing.JobKey;
 import jus.aor.printing.JobState;
@@ -46,6 +48,7 @@ public class Client {
 	public void selectPrinter() {
 		// constuction du listener de spooler
 		//----------------------------------------------------------------------------- A COMPLETER
+		
 	}
 	/**
 	 * Se déconnecte d'un serveur d'impression, on ne peut plus envoyer de requête au serveur.
@@ -81,24 +84,50 @@ public class Client {
 	 */
 	private void onePrint(File f){
 		Socket soc = null;
-		
 		try(InputStream fis = new FileInputStream(f)){
 			//-------------------------------------------------------------------------- A COMPLETER
-			Notification ret = QUERY_PRINT;
+			Notification ret = null;
 			soc = new Socket(host, port);
 			
 			//Client connected
-			System.out.println("Connected to "+ soc.getInetAddress());
+			log.log(Level.INFO_1, "Connected to "+ soc.getInetAddress());
 			
 			//Client sends bytes to server
+			OutputStream so = soc.getOutputStream();
+			InputStream si = soc.getInputStream();
+			DataOutputStream dout = new DataOutputStream(so);
+			DataInputStream din = new DataInputStream(si);
 			
-			
-			if(ret == REPLY_PRINT_OK) {
-				//------------------------------------------------------------------------ A COMPLETER
+			JobKey key = new JobKey(30012015);
+			byte[] b =  key.marshal(), b_bis = null;
+			dout.writeInt(QUERY_PRINT.ordinal());
+			dout.writeInt(b.length);
+			dout.write(b);
+			log.log(Level.INFO_1, b.toString());
+			//Wait for the server reply
+			int notif_reply = din.readInt();
+			ret = Notification.values()[notif_reply];
+			log.log(Level.INFO_1, ret.toString());
+			if(ret == Notification.REPLY_PRINT_OK) {
+				//On récupère le fichier envoyé prececdement afin de verifier son intégrité. Et on l'affiche dans le fenetre
+				log.log(Level.INFO_1,"Client : Verification du message ");
+				int length = din.readInt();
+				b_bis = new byte[length];
+				din.read(b_bis, 0, length);
+//				log.log(Level.INFO_1,"Client : byte[] = "+b_bis.toString());
+//				System.out.println("Client : byte[] = "+b_bis.toString());
+				
+				if (! b.equals(b_bis))
+					log.log(Level.INFO_1,"Client : WARNING Message de verification erroné " + b.toString()+ " != " + b_bis.toString());
+				else 
+					log.log(Level.INFO_1,"Client : WARNING Message de verification OK " + b.toString()+ " == " + b_bis.toString());
 				// Dans le cas où tout est correct on ajoute le job à la liste des encours.
-				//	{log.log(Level.INFO_3,"Client.QueryPrint.Processing",key);
-				//	GUI.addPrintList(key);}
-			} else log.log(Level.WARNING,"Client.QueryPrint.Failed",ret.toString());
+				log.log(Level.INFO_3,"Client.QueryPrint.Processing",key);
+				GUI.addPrintList(key);
+			} else {
+				log.log(Level.WARNING,"Client.QueryPrint.Failed",ret.toString());
+				log.log(Level.INFO_1,"Client.QueryPrint.Failed",ret.toString());
+			}
 		}catch(NumberFormatException e){
 			log.log(Level.SEVERE,"Client.QueryPrint.Port.Error",e.getMessage());
 		}catch(UnknownHostException e){
@@ -134,6 +163,13 @@ public class Client {
 	 * @param args
 	 */
 	public static void main(String args[]) {
-		new Client();
+		Client client = new Client();
+		Client client2 = new Client();
+//		System.out.println(Client.class.getResource("Client.properties").getPath());
+		String path = Client.class.getResource("Client.properties").getPath();
+		client.onePrint(new File(path));
+		client.queryPrint(new File(path), 10);
+		
+		client2.onePrint(new File(path));
 	}
 }
