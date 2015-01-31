@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 import java.io.*;
 
 import sun.security.util.Length;
-
 import jus.aor.printing.Client;
 import jus.aor.printing.JobKey;
 import jus.aor.printing.JobState;
@@ -15,7 +14,6 @@ import jus.aor.printing.Paire;
 import jus.aor.printing.ServerStatus;
 import jus.aor.printing.TCP;
 import jus.aor.printing.UDP;
-
 import static jus.aor.printing.Notification.*;
 /**
  * Représentation du Client du serveur d'impression.
@@ -34,6 +32,7 @@ public class Client {
 	private Logger log = Logger.getLogger("Jus.Aor.Printing.Client","jus.aor.printing.Client");
 	/** l'interfaçage avec la console du client */
 	private ClientGUI GUI;
+	private Socket soc;
 	/**
 	 * construction d'un client
 	 */
@@ -48,7 +47,6 @@ public class Client {
 	public void selectPrinter() {
 		// constuction du listener de spooler
 		//----------------------------------------------------------------------------- A COMPLETER
-		
 	}
 	/**
 	 * Se déconnecte d'un serveur d'impression, on ne peut plus envoyer de requête au serveur.
@@ -93,34 +91,28 @@ public class Client {
 			log.log(Level.INFO_1, "Connected to "+ soc.getInetAddress());
 			
 			//Client sends bytes to server
-			OutputStream so = soc.getOutputStream();
-			InputStream si = soc.getInputStream();
-			DataOutputStream dout = new DataOutputStream(so);
-			DataInputStream din = new DataInputStream(si);
-			
-			JobKey key = new JobKey(30012015);
-			byte[] b =  key.marshal(), b_bis = null;
-			dout.writeInt(QUERY_PRINT.ordinal());
-			dout.writeInt(b.length);
-			dout.write(b);
-			log.log(Level.INFO_1, b.toString());
+			TCP.writeProtocole(soc, QUERY_PRINT);
+			JobKey key = new JobKey();
+			System.out.println("Client : Envoi du Job_Key : "+key.toString());
+			TCP.writeJobKey(soc, key);
+
+			System.out.println("Client : Envoi du du fichier : "+f.getName());
+			TCP.writeData(soc, fis, (int) f.length());
+            
 			//Wait for the server reply
-			int notif_reply = din.readInt();
-			ret = Notification.values()[notif_reply];
-			log.log(Level.INFO_1, ret.toString());
+			ret = TCP.readProtocole(soc);;
 			if(ret == Notification.REPLY_PRINT_OK) {
 				//On récupère le fichier envoyé prececdement afin de verifier son intégrité. Et on l'affiche dans le fenetre
-				log.log(Level.INFO_1,"Client : Verification du message ");
-				int length = din.readInt();
-				b_bis = new byte[length];
-				din.read(b_bis, 0, length);
-//				log.log(Level.INFO_1,"Client : byte[] = "+b_bis.toString());
-//				System.out.println("Client : byte[] = "+b_bis.toString());
+				System.out.println("Client : Verification du message ");
+				JobKey key_ = TCP.readJobKey(soc);
 				
-				if (! b.equals(b_bis))
-					log.log(Level.INFO_1,"Client : WARNING Message de verification erroné " + b.toString()+ " != " + b_bis.toString());
+				System.out.println("Client : Job_key : "+key_.toString());
+				
+				if (! key.equals(key_))
+					System.out.println("Client : Message de verification : Le jobkey renvoy� par serveur ERREUR " + key.toString()+ " != " + key_.toString());
 				else 
-					log.log(Level.INFO_1,"Client : WARNING Message de verification OK " + b.toString()+ " == " + b_bis.toString());
+					System.out.println("Client : Message de verification : Le jobkey renvoy� par serveur OK " + key.toString());
+				
 				// Dans le cas où tout est correct on ajoute le job à la liste des encours.
 				log.log(Level.INFO_3,"Client.QueryPrint.Processing",key);
 				GUI.addPrintList(key);
@@ -136,7 +128,7 @@ public class Client {
 			log.log(Level.SEVERE,"Client.QueryPrint.IO.Error",e.getMessage()); 
 		}
 	}
-	/**
+	/** Pour effetuer n impressions
 	 * Réalise l'émission quasi-simultanée de n requêtes d'impression à l'aide de onePrint
 	 * @param f le fichier à imprimer
 	 * @param n nombre de requêtes d'impression à faire
@@ -164,12 +156,12 @@ public class Client {
 	 */
 	public static void main(String args[]) {
 		Client client = new Client();
-		Client client2 = new Client();
-//		System.out.println(Client.class.getResource("Client.properties").getPath());
-		String path = Client.class.getResource("Client.properties").getPath();
-		client.onePrint(new File(path));
-		client.queryPrint(new File(path), 10);
-		
-		client2.onePrint(new File(path));
+//		Client client2 = new Client();
+////		System.out.println(Client.class.getResource("Client.properties").getPath());
+//		String path = Client.class.getResource("Client.properties").getPath();
+//		client.onePrint(new File(path));
+//		client.queryPrint(new File(path), 10);
+//		
+//		client2.onePrint(new File(path));
 	}
 }

@@ -37,7 +37,7 @@ public class JobKey {
 	 */
 	public JobKey(byte[] marshal) {
 		//----------------------------------------------------------------------------- A COMPLETER
-		this.date = new Long(new String (marshal));
+		this.serverId = new String (marshal);
 	}
 	/**
 	 * restitue le tableau de bytes de la forme textuelle.
@@ -45,18 +45,13 @@ public class JobKey {
 	 */
 	public byte[] marshal() {
 		//----------------------------------------------------------------------------- A COMPLETER
-		//byte[] b = new byte[1];
-		//b[0] = new Long(date).byteValue();
-		byte[] b = new Long(date).toString().getBytes();
-		System.out.println(date);
-		System.out.println("Print tab byte "+new String (b));
-		return b;
+		return serverId.getBytes();
 	}
 	/**
 	 * la forme textuelle : "<<b>serverId</b>>¤<<b>date</b>>"
 	 * où <<b>X</b>> est la repésentation textuelle de l'attribut correspondant
 	 */
-	public String toString() { return (serverId+"¤"+date);}
+	public String toString() { return (serverId+"--"+date);}
 	/**
 	 * L'équivalence de 2 JobKey, si jobId est vide il n'est pas pris en compte,
 	 * si date est 0 elle n'est pas prise en compte.

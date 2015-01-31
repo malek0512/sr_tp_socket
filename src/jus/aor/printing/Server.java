@@ -10,6 +10,7 @@ import java.net.*;
 import java.util.*;
 import java.util.logging.Logger;
 
+
 //import jus.aor.printing.Esclave.Slave;
 import static jus.aor.printing.Notification.*;
 /**
@@ -55,37 +56,27 @@ public class Server {
 					soc = serverTCPSoc.accept();
 					
 					//A client connected
-					log.log(Level.INFO_1, "Client" + soc.getInetAddress() + "connected");
+					log.log(Level.INFO_1, "Client " + soc.getInetAddress() + "connected");
 					
 					
 					//Server receives bytes from client
-					OutputStream so = soc.getOutputStream();
-					InputStream si = soc.getInputStream();
-					DataOutputStream dout = new DataOutputStream(so);
-					DataInputStream din = new DataInputStream(si);
+					protocole = TCP.readProtocole(soc);
+					log.log(Level.INFO_1, "Server : " + protocole.toString() + " received !");
 					
-					int notif_ordinal = din.readInt();
-					Notification notif_received = Notification.values()[notif_ordinal];
-					log.log(Level.INFO_1, "Server : notif ordinal" + notif_ordinal);
-					log.log(Level.INFO_1, "Server : " + notif_received.toString() + " received !");
-					
-					switch (notif_received) {
+					switch (protocole) {
 					case QUERY_PRINT :
+						JobKey key = TCP.readJobKey(soc);
 						
-//						//Recuperation de la taille du fichier
-//						int length = din.readInt();
-//						//Recuperation du fichier
-//						byte[] b = new byte[length];
-//						din.read(b, 0, length);
-//						//Impression du fichier sur la fenetre de Log_1
-//						log.log(Level.INFO_1, "Server : " + "Data receveived " + new String(b));
-//						//Notification de de bonne reception
-//						dout.writeInt(Notification.REPLY_PRINT_OK.ordinal());
-//						//Reemission du messsage pour verification aupres du client
-//						dout.writeInt(b.length);
-//						dout.write(b);
+						Esclave.newSlave(soc);
 						
-						new 
+						log.log(Level.INFO_1, "Server : Job_Key  " + key.toString() + "  received !");
+						
+						System.out.println("Server : Sending REPLY_PRINT_OK ");
+						TCP.writeProtocole(soc, REPLY_PRINT_OK);
+						System.out.println("Server : Sending the Job_key ");
+						TCP.writeJobKey(soc, key);
+						
+						
 						break;
 						
 					default : 
@@ -110,13 +101,10 @@ public class Server {
 		}
 	}
 	protected void setBacklog(int backlog) {
-		System.out.println("baslog" + backlog);
 		this.backlog=backlog;}
 	protected void setport(int port) {
-		System.out.println("port" + port);
 		this.port=port;}
 	protected void setPoolSize(int poolSize) { 
-		System.out.println("NONNNNNNNN" + poolSize);
 		this.poolSize=poolSize;}
 	/**
 	 * 
@@ -125,7 +113,7 @@ public class Server {
 	public static void main (String args[]) {
 		Server s = new Server();
 		ServerGUI sg = new ServerGUI(s);
-		System.out.println(sg.PoolSizeWidget.getText());
+//		System.out.println(sg.PoolSizeWidget.getText());
 		s.runTCP();
 	}
 }
